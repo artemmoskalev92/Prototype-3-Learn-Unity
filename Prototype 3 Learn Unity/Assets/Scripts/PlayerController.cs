@@ -4,11 +4,16 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    private Rigidbody playerRb;
+    
     private float jumpForce = 500;
-    private float gravityModifier = 1.2f;
+    public float doubleJumpForce;
+    private float gravityModifier = 1.4f;
     public bool isOnGround = true;
     public bool gameOver = false;
+    public bool isDoubleJumped = false;
+    public bool doubleSpeed = false;
+
+    private Rigidbody playerRb;
     private Animator playerAnim;
     public ParticleSystem explosionParticle;
     public ParticleSystem dirtParticle;
@@ -37,6 +42,24 @@ public class PlayerController : MonoBehaviour
             isOnGround = false;
             playerAnim.SetTrigger("Jump_trig");
             playerAudio.PlayOneShot(jumpSound, 1.0f);
+            isDoubleJumped = false;
+        }
+        else if (Input.GetKeyDown(KeyCode.Space) && !isOnGround && !isDoubleJumped)
+        {
+            isDoubleJumped = true;
+            playerRb.AddForce(Vector3.up * doubleJumpForce, ForceMode.Impulse);
+            playerAnim.Play("Running_Jump", 3, 0f);
+            playerAudio.PlayOneShot(jumpSound, 1.0f);
+        }
+        if (Input.GetKey(KeyCode.LeftShift))
+        {
+            doubleSpeed = true;
+            playerAnim.SetFloat("Speed_Multiplier", 2.0f);
+        }
+        else if (doubleSpeed)
+        {
+            doubleSpeed = false;
+            playerAnim.SetFloat("Speed_Multiplier", 1.0f);
         }
     }
     private void OnCollisionEnter(Collision collision)
